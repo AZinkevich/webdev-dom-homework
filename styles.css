@@ -62,6 +62,7 @@ body {
 
 .comment-text {
   font-size: 32px;
+  cursor: pointer;
 }
 
 .likes {
@@ -129,7 +130,7 @@ body {
   align-items: flex-end;
 }
 
-.add-form-button, .remove-last-com, .edit-button, .save-button  {
+.add-form-button, .remove-last-com, .edit-button, .save-button {
   margin-top: 24px;
   font-size: 24px;
   padding: 10px 20px;
@@ -139,6 +140,11 @@ body {
   cursor: pointer;
 }
 
+.edit-button:disabled, .save-button:disabled {
+  background-color: rgb(114, 110, 106);
+  cursor: default;
+}
+
 .add-form-button:hover, .remove-last-com:hover, .edit-button:hover, .save-button {
   opacity: 0.9;
 }
@@ -146,4 +152,18 @@ body {
 .add-form-button:disabled {
   background-color: rgb(114, 110, 106);
   cursor: default;
+}
+
+.quote {
+  color: #202020;
+  background-color: #fff;
+  font-size: 16px;
+  margin-top: 22px;
+  margin-bottom: 22px;
+  padding: 16px;
+}
+
+.replay-form-link {
+  text-decoration: none;
+  color: #ffffff;
 }

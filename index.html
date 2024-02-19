@@ -36,7 +36,6 @@
   </body>
   <script>
     "use strict";
-    // Код писать здесь
     const nameEl = document.getElementById("add-form-name");
     const textEl = document.getElementById("add-form-text");
     const buttonEl = document.getElementById("add-form-button");
@@ -128,6 +127,18 @@
       return (text = comments[index].text);
     };
 
+    const initReplayListener = () => {
+      const replayComments = document.querySelectorAll(".comment-text");
+      for (const replayComment of replayComments) {
+        replayComment.addEventListener("click", (event) => {
+          event.stopPropagation();
+          const index = replayComment.dataset.index;
+          textEl.value = `QUOTE_BEGIN ${comments[index].name} \n ${comments[index].text} QUOTE_END`;
+          renderComments();
+        });
+      }
+    };
+
     const renderComments = () => {
       const commentsHtml = comments
         .map((comment, index) => {
@@ -159,8 +170,8 @@
             <div id="add-form-date">${comment.date}</div>
           </div>
           <div class="comment-body">
-            <div class="comment-text">
-              ${editComment()}
+            <div data-index="${index}" class="comment-text" style="white-space:pre-line">
+              <a class="replay-form-link" href="#add-form">${editComment()}</a>
             </div>
           </div>
           <div class="comment-footer">
@@ -170,7 +181,7 @@
           }</span>
               <button data-index="${index}" class="like-button ${activeLike()}"></button>
             </div>
-            <div><button data-index="${index}" ${saveButton()}</button></div>
+            <div><button disabled data-index="${index}" ${saveButton()}</button></div>
           </div>
         </li>`;
         })
@@ -186,13 +197,15 @@
       }
 
       formEl.addEventListener("keyup", (e) => {
-        if (e.code === "Enter") {
+        if (!e.shiftKey && e.code === "Enter") {
           buttonEl.click();
         }
       });
+
       initLikeButtonListener();
-      initEditButtonlistener();
+      //initEditButtonlistener();
       initSaveButtonlistener();
+      initReplayListener();
     };
 
     buttonEl.addEventListener("click", () => {
@@ -209,19 +222,36 @@
         textEl.classList.add("add-form_error");
         return;
       }
+
+      const nameValue = nameEl.value
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+
+      const textValue = textEl.value
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("QUOTE_BEGIN", "<div class='quote'>")
+        .replaceAll("QUOTE_END", "</div>");
+
       comments.push({
         date: currentDate,
-        name: nameEl.value,
-        text: textEl.value,
+        name: nameValue,
+        text: textValue,
         like_active: false,
         like_count: 0,
         isEdit: false,
       });
 
+      nameEl.value = "";
+      textEl.value = "";
+
       renderComments();
     });
-    renderComments();
-
+    
     buttonRemEl.addEventListener("click", () => {
       comments.pop();
       renderComments();
