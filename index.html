@@ -25,6 +25,8 @@
     const listEl = document.getElementById("list");
     const formEl = document.getElementById("add-form");
 
+    console.log(formEl)
+
     let isLoading = false;
 
     function formatDate(date) {
@@ -69,6 +71,7 @@
           console.log(isLoading);
           renderComments();
           renderForm();
+         
         });
       });
     };
@@ -160,6 +163,53 @@
             Удалить последний
           </button>
         </div>`;
+      
+        const buttonClick = () => {
+      buttonEl.addEventListener("click", () => {
+        nameEl.value = nameEl.value.trim();
+        textEl.value = textEl.value.trim();
+
+        nameEl.classList.remove("add-form_error");
+        textEl.classList.remove("add-form_error");
+
+        if (nameEl.value === "" && textEl.value === "") {
+          nameEl.classList.add("add-form_error");
+          textEl.classList.add("add-form_error");
+          return;
+        } else if (nameEl.value === "") {
+          nameEl.classList.add("add-form_error");
+          return;
+        } else if (textEl.value === "") {
+          textEl.classList.add("add-form_error");
+          return;
+        }
+
+       
+        fetch("https://wedev-api.sky.pro/api/v1/:azinkevich/comments", {
+          method: "POST",
+          body: JSON.stringify({
+            date: formatDate(new Date()),
+            name: nameEl.value,
+            text: textEl.value,
+            like_active: false,
+            like_count: 0,
+            isEdit: false,
+          }),
+        }).then((response) => {
+          response.json().then((responseData) => {
+            comments = responseData.comments;
+
+            fetchGet();
+          });
+        });
+
+        nameEl.value = "";
+        textEl.value = "";
+
+        renderComments();
+      });
+    };
+
       }
     };
 
@@ -214,7 +264,6 @@
       initEditButtonlistener();
       initSaveButtonlistener();
       initReplayListener();
-      
     };
 
     function sanitize(text) {
@@ -240,52 +289,10 @@
           buttonEl.click();
         }
       });
+      
     }
 
-    const buttonClick = () => {
-      buttonEl.addEventListener("click", () => {
-        nameEl.value = nameEl.value.trim();
-        textEl.value = textEl.value.trim();
-
-        nameEl.classList.remove("add-form_error");
-        textEl.classList.remove("add-form_error");
-
-        if (nameEl.value === "" && textEl.value === "") {
-          nameEl.classList.add("add-form_error");
-          textEl.classList.add("add-form_error");
-          return;
-        } else if (nameEl.value === "") {
-          nameEl.classList.add("add-form_error");
-          return;
-        } else if (textEl.value === "") {
-          textEl.classList.add("add-form_error");
-          return;
-        }
-
-        fetch("https://wedev-api.sky.pro/api/v1/:azinkevich/comments", {
-          method: "POST",
-          body: JSON.stringify({
-            date: formatDate(new Date()),
-            name: nameEl.value,
-            text: textEl.value,
-            like_active: false,
-            like_count: 0,
-            isEdit: false,
-          }),
-        }).then((response) => {
-          response.json().then((responseData) => {
-            comments = responseData.comments;
-
-            fetchGet();
-          });
-        });
-
-        nameEl.value = "";
-        textEl.value = "";
-
-        renderComments();
-      });
-    }
+   
 
     // buttonRemEl.addEventListener("click", () => {
     //   comments.pop();
@@ -295,7 +302,6 @@
     fetchGet();
     renderComments();
     renderForm();
-    buttonClick();
-    validInput();
+    
   </script>
 </html>
