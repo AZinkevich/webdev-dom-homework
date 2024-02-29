@@ -8,9 +8,15 @@
 
   <body>
     <div class="container">
+      <div class="loader" id="com-loader" hidden>
+        Пожалуйста подождите, комментарии загружаются...
+      </div>
       <ul id="list" class="comments">
         <!-- Список рендерится JS -->
       </ul>
+      <div class="loader" id="form-loader" hidden>
+        Комментарий добавляется...
+      </div>
       <div id="add-form" class="add-form">
         <input
           id="add-form-name"
@@ -27,7 +33,7 @@
         ></textarea>
         <div class="add-form-row">
           <button id="add-form-button" class="add-form-button">Написать</button>
-          <button id="remove-last-com" class="remove-last-com">
+          <button disabled id="remove-last-com" class="remove-last-com">
             Удалить последний
           </button>
         </div>
@@ -36,12 +42,17 @@
   </body>
   <script>
     "use strict";
+
+    let isLoading = false;
+
     const nameEl = document.getElementById("add-form-name");
     const textEl = document.getElementById("add-form-text");
     const buttonEl = document.getElementById("add-form-button");
     const buttonRemEl = document.getElementById("remove-last-com");
     const listEl = document.getElementById("list");
     const formEl = document.getElementById("add-form");
+    const comLoader = document.getElementById("com-loader");
+    const formLoader = document.getElementById("form-loader");
 
     function formatDate(date) {
       const options1 = {
@@ -63,36 +74,30 @@
 
     let comments = [];
 
-    const fetchGet = () => {
-      fetch("https://wedev-api.sky.pro/api/v1/:azinkevich/comments", {
-        method: "GET",
-      }).then((response) => {
-        response.json().then((responseData) => {
-          const appComments = responseData.comments.map((comment) => {
-            return {
-              name: comment.author.name,
-              text: comment.text,
-              like_active: comment.isLiked,
-              like_count: comment.likes,
-              date: formatDate(new Date(comment.date)),
-            };
-          });
-
-          comments = appComments;
-          renderComments();
-        });
+    function delay(interval = 300) {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve();
+        }, interval);
       });
-    };
+    }
 
     const initLikeButtonListener = () => {
       const likeButtonElements = document.querySelectorAll(".like-button");
       likeButtonElements.forEach((el, index) => {
         el.addEventListener("click", () => {
-          comments[index].like_active = !comments[index].like_active;
-          comments[index].like_active
-            ? comments[index].like_count++
-            : comments[index].like_count--;
-          renderComments();
+          el.classList.add("-loading-like");
+          delay(2000)
+            .then(() => {
+              comments[index].like_active = !comments[index].like_active;
+              comments[index].like_active
+                ? comments[index].like_count++
+                : comments[index].like_count--;
+              renderComments();
+            })
+            .then(() => {
+              el.classList.remove("-loading-like");
+            });
         });
       });
     };
@@ -186,7 +191,7 @@
             comment.like_active ? "-active-like" : ""
           }"></button>
             </div>
-            <div><button data-index="${index}" ${saveButton()}</button></div>
+            <div><button disabled data-index="${index}" ${saveButton()}</button></div>
           </div >
         </li>`;
         })
@@ -198,7 +203,6 @@
       initEditButtonlistener();
       initSaveButtonlistener();
       initReplayListener();
-
     };
 
     function sanitize(text) {
@@ -243,7 +247,10 @@
         return;
       }
 
-      fetch("https://wedev-api.sky.pro/api/v1/:azinkevich/comments", {
+      formEl.classList.add("add-form_displayNone");
+      formLoader.hidden = false;
+      isLoading = true;
+      fetch("https://wedev-api.sky.pro/api/v1/:aich/comments", {
         method: "POST",
         body: JSON.stringify({
           date: formatDate(new Date()),
@@ -253,13 +260,17 @@
           like_count: 0,
           isEdit: false,
         }),
-      }).then((response) => {
-        response.json().then((responseData) => {
-          comments = responseData.comments;
-
-          fetchGet();
+      })
+        .then((response) => {
+          return response.json();
+        })
+        .then(() => {
+          return fetchGet();
+        })
+        .then(() => {
+          formEl.classList.remove("add-form_displayNone");
+          formLoader.hidden = true;
         });
-      });
 
       nameEl.value = "";
       textEl.value = "";
@@ -267,10 +278,36 @@
       renderComments();
     });
 
-    buttonRemEl.addEventListener("click", () => {
-      comments.pop();
-      renderComments();
-    });
+    const fetchGet = () => {
+      isLoading ? (comLoader.hidden = true) : (comLoader.hidden = false);
+
+      return fetch("https://wedev-api.sky.pro/api/v1/:aich/comments", {
+        method: "GET",
+      })
+        .then((response) => {
+          return response.json();
+        })
+        .then((responseData) => {
+          const appComments = responseData.comments.map((comment) => {
+            return {
+              name: comment.author.name,
+              text: comment.text,
+              like_active: comment.isLiked,
+              like_count: comment.likes,
+              date: formatDate(new Date(comment.date)),
+            };
+          });
+          comLoader.hidden = true;
+          comments = appComments;
+          renderComments();
+        });
+    };
+
+    // buttonRemEl.addEventListener("click", () => {
+    //   comments.pop();
+    //   renderComments();
+    // });
+
     fetchGet();
     renderComments();
   </script>
