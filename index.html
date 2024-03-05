@@ -33,9 +33,6 @@
         ></textarea>
         <div class="add-form-row">
           <button id="add-form-button" class="add-form-button">Написать</button>
-          <button disabled id="remove-last-com" class="remove-last-com">
-            Удалить последний
-          </button>
         </div>
       </div>
     </div>
@@ -48,7 +45,6 @@
     const nameEl = document.getElementById("add-form-name");
     const textEl = document.getElementById("add-form-text");
     const buttonEl = document.getElementById("add-form-button");
-    const buttonRemEl = document.getElementById("remove-last-com");
     const listEl = document.getElementById("list");
     const formEl = document.getElementById("add-form");
     const comLoader = document.getElementById("com-loader");
@@ -102,44 +98,6 @@
       });
     };
 
-    const initEditButtonlistener = () => {
-      const editButtonElements = document.querySelectorAll(".edit-button");
-      for (const editButtonElement of editButtonElements) {
-        editButtonElement.addEventListener("click", () => {
-          const index = editButtonElement.dataset.index;
-          comments[index].isEdit = true;
-          renderComments();
-        });
-      }
-    };
-
-    const initSaveButtonlistener = () => {
-      const saveButtonElements = document.querySelectorAll(".save-button");
-      for (const saveButtonElement of saveButtonElements) {
-        saveButtonElement.addEventListener("click", () => {
-          const index = saveButtonElement.dataset.index;
-          comments[index].isEdit = false;
-          comments[index].text = textEditElement(index);
-          renderComments();
-        });
-      }
-      const textArea = document.querySelector(".add-form-edit-text");
-      if (textArea) {
-        textArea.addEventListener("click", (e) => {
-          e.stopPropagation();
-        });
-      }
-    };
-
-    const textEditElement = (index) => {
-      const textEditElements = document.querySelectorAll(".add-form-edit-text");
-      for (const textEditElement of textEditElements) {
-        const index = textEditElement.dataset.index;
-        comments[index].text = textEditElement.value;
-      }
-      return comments[index].text;
-    };
-
     const initReplayListener = () => {
       const replayComments = document.querySelectorAll(".comment-text");
       for (const replayComment of replayComments) {
@@ -163,13 +121,6 @@
               return `${sanitize(comment.text)} `;
             }
           };
-          let saveButton = () => {
-            if (!comment.isEdit) {
-              return `class="edit-button" > Редактировать`;
-            } else {
-              return `class="save-button" > Сохранить`;
-            }
-          };
           return `<li class="comment">
           <div class="comment-header">
             <div>${sanitize(comment.name)}</div>
@@ -191,7 +142,6 @@
             comment.like_active ? "-active-like" : ""
           }"></button>
             </div>
-            <div><button disabled data-index="${index}" ${saveButton()}</button></div>
           </div >
         </li>`;
         })
@@ -200,8 +150,6 @@
       listEl.innerHTML = commentsHtml;
 
       initLikeButtonListener();
-      initEditButtonlistener();
-      initSaveButtonlistener();
       initReplayListener();
     };
 
@@ -218,8 +166,8 @@
     buttonEl.disabled = true;
     nameEl.addEventListener("input", evnt);
     textEl.addEventListener("input", evnt);
-    function evnt() {
-      if (Text.value !== "") buttonEl.disabled = false;
+    function evnt(event) {
+      if (event.target.value !== "") buttonEl.disabled = false;
     }
 
     formEl.addEventListener("keyup", (e) => {
@@ -247,43 +195,82 @@
         return;
       }
 
-      formEl.classList.add("add-form_displayNone");
-      formLoader.hidden = false;
-      isLoading = true;
-      fetch("https://wedev-api.sky.pro/api/v1/:aich/comments", {
-        method: "POST",
-        body: JSON.stringify({
-          date: formatDate(new Date()),
-          name: nameEl.value,
-          text: textEl.value,
-          like_active: false,
-          like_count: 0,
-          isEdit: false,
-        }),
-      })
-        .then((response) => {
-          return response.json();
+      function fetchPost() {
+        formEl.classList.add("add-form_displayNone");
+        formLoader.hidden = false;
+        isLoading = true;
+        fetch("https://wedev-api.sky.pro/api/v1/:vich/comments", {
+          method: "POST",
+          body: JSON.stringify({
+            name: nameEl.value,
+            text: textEl.value,
+            forceError: true,
+          }),
         })
-        .then(() => {
-          return fetchGet();
-        })
-        .then(() => {
-          formEl.classList.remove("add-form_displayNone");
-          formLoader.hidden = true;
-        });
+          .then((response) => {
+            if (response.status === 400) {
+              throw new Error("Неправильный запрос");
+            }
+            if (response.status === 500) {
+              throw new Error("Сервер сломался");
+            }
+            return response;
+          })
+          .then((response) => {
+            return response.json();
+          })
+          .then(() => {
+            return fetchGet();
+          })
+          .then(() => {
+            buttonEl.disabled = true;
+            nameEl.value = "";
+            textEl.value = "";
+            formEl.classList.remove("add-form_displayNone");
+            formLoader.hidden = true;
+          })
+          .catch((error) => {
+            formEl.classList.remove("add-form_displayNone");
+            formLoader.hidden = true;
 
-      nameEl.value = "";
-      textEl.value = "";
-
-      renderComments();
+            if (error.message === "Неправильный запрос") {
+              alert("Длина имени и комментария должна быть более 3 символов");
+              console.warn(error);
+              return;
+            }
+            if (error.message === "Сервер сломался") {
+              console.warn(error);
+              console.log("Повторная отправка");
+              fetchPost();
+              return;
+            }
+            if (error.message === "Failed to fetch") {
+              console.warn(error);
+              alert(
+                "Сбой подключения! Пожалуйста, проверьте подключение и повторите отправку."
+              );
+              comLoader.textContent =
+                "Комментарии не загружены. Пожалуйста, проверьте подключение и повторите отправку.";
+              return;
+            }
+          });
+        renderComments();
+      }
+      fetchPost();
     });
 
     const fetchGet = () => {
       isLoading ? (comLoader.hidden = true) : (comLoader.hidden = false);
 
-      return fetch("https://wedev-api.sky.pro/api/v1/:aich/comments", {
+      return fetch("https://wedev-api.sky.pro/api/v1/:vich/comments", {
         method: "GET",
       })
+        .then((response) => {
+          if (response.status === 500) {
+            throw new Error("Сервер сломался");
+          }
+          return response;
+        })
         .then((response) => {
           return response.json();
         })
@@ -295,18 +282,31 @@
               like_active: comment.isLiked,
               like_count: comment.likes,
               date: formatDate(new Date(comment.date)),
+              //forceError: true,
             };
           });
           comLoader.hidden = true;
           comments = appComments;
           renderComments();
+        })
+        .catch((error) => {
+          if (error.message === "Failed to fetch") {
+            console.warn(error);
+            alert(
+              "Сбой подключения! Пожалуйста, проверьте подключение и обновите страницу."
+            );
+            comLoader.textContent =
+              "Комментарии не загружены. Пожалуйста, проверьте подключение и обновите страницу.";
+            return;
+          }
+          if (error.message === "Сервер сломался") {
+            console.warn(error);
+            console.log("Повторная загрузка");
+            fetchGet();
+            return;
+          }
         });
     };
-
-    // buttonRemEl.addEventListener("click", () => {
-    //   comments.pop();
-    //   renderComments();
-    // });
 
     fetchGet();
     renderComments();
