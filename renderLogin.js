@@ -1,12 +1,6 @@
 import { login, setLoading, setToken } from "./api.js";
 import { renderReg } from "./renderReg.js";
 
-
-export let userLogin;
-export const setLogin = (newUserLogin) => {
-  userLogin = newUserLogin;
-};
-
 export const renderLogin = ({ fetchGetAndRenderComments }) => {
   const appElement = document.getElementById("app");
   const loginHTML = `
@@ -42,12 +36,13 @@ export const renderLogin = ({ fetchGetAndRenderComments }) => {
   const passwordInputElement = document.getElementById("password-input");
 
   ButtonElement.addEventListener("click", () => {
-    login({
+    login({      
       login: loginInputElement.value,
       password: passwordInputElement.value,
     })
       .then((responseData) => {
         setToken(responseData.user.token);
+        localStorage.setItem('token', responseData.user.token);
         return responseData;
       })
       .then((responseData) => {
@@ -57,8 +52,7 @@ export const renderLogin = ({ fetchGetAndRenderComments }) => {
         return responseData;
       })
       .then((responseData) => {
-        console.log("login")
-        setLogin(responseData.user.name);
+        localStorage.setItem('user', responseData.user.name);
         setLoading(false);
         fetchGetAndRenderComments();
       })
