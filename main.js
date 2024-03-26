@@ -1,6 +1,6 @@
 import { fetchGet, setLoading } from './api.js';
 import { renderComments } from './renderComments.js';
-import { formatDate } from './formatdate.js';
+//import { formatDate } from './formatdate.js';
 import { format } from 'date-fns';
 
 let comments = [];
