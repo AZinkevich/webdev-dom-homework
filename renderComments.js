@@ -1,20 +1,20 @@
-import { sanitize } from "./sanitize.js";
-import { initLikeButtonListener } from "./likebutton.js";
-import { initReplayListener } from "./reply.js";
-import { renderLogin } from "./renderLogin.js";
-import { fetchGetAndRenderComments } from "./main.js";
-import { setLoading, token } from "./api.js";
-import { userInput1, userInput2 } from "./userinput.js";
-import { fetchPost } from "./api.js";
-import { formLoader } from "./renderLoader.js";
+import { sanitize } from './sanitize.js';
+import { initLikeButtonListener } from './likebutton.js';
+import { initReplayListener } from './reply.js';
+import { renderLogin } from './renderLogin.js';
+import { fetchGetAndRenderComments } from './main.js';
+import { setLoading, token } from './api.js';
+import { userInput1, userInput2 } from './userinput.js';
+import { fetchPost } from './api.js';
+import { formLoader } from './renderLoader.js';
 
 export let textValue;
 
-export const textEl = document.getElementById("add-form-text");
+export const textEl = document.getElementById('add-form-text');
 
 export function renderComments(comments) {
-  console.log("renderComments");
-  const appElement = document.getElementById("app");
+  console.log('renderComments');
+  const appElement = document.getElementById('app');
 
   const formHTML = `
       <div id="add-form" class="add-form">
@@ -45,21 +45,24 @@ export function renderComments(comments) {
         </div>
         <div class="comment-body">
           <div data-index="${index}" class="comment-text" style="white-space:pre-line">
-            <a class="replay-form-link" ${comment.isEdit ? "" : 'href="#add-form"'
-        }> ${editComment()}</a>
+            <a class="replay-form-link" ${
+              comment.isEdit ? '' : 'href="#add-form"'
+            }> ${editComment()}</a>
           </div>
         </div>
         <div class="comment-footer">
           <div class="likes">
-            <span data-index="${index}" class="likes-counter">${comment.like_count
-        }</span>
-            <button data-index="${index}" class="like-button ${comment.like_active ? "-active-like" : ""
-        }"></button>
+            <span data-index="${index}" class="likes-counter">${
+              comment.like_count
+            }</span>
+            <button data-index="${index}" class="like-button ${
+              comment.like_active ? '-active-like' : ''
+            }"></button>
           </div>
         </div >
       </li>`;
     })
-    .join("");
+    .join('');
 
   appElement.innerHTML = `
   <ul id="list" class="comments">
@@ -75,33 +78,32 @@ export function renderComments(comments) {
   initReplayListener({ comments });
   initLikeButtonListener(comments);
   logoutAction();
-  
 }
 
 function authAction() {
   if (token) return;
-  const loginLinkEl = document.getElementById("login-link");
-  loginLinkEl.addEventListener("click", () => {
+  const loginLinkEl = document.getElementById('login-link');
+  loginLinkEl.addEventListener('click', () => {
     renderLogin({ fetchGetAndRenderComments });
   });
 }
 
 function logoutAction() {
-  const logoutButtonEl = document.getElementById("logout-form-button");
-  logoutButtonEl.addEventListener("click", () => {
+  const logoutButtonEl = document.getElementById('logout-form-button');
+  logoutButtonEl.addEventListener('click', () => {
     localStorage.clear();
     location.reload();
-  })
+  });
 }
 
 export function formAction() {
   if (!token) return;
-  const nameEl = document.getElementById("add-form-name");
-  const textEl = document.getElementById("add-form-text");
-  const buttonEl = document.getElementById("add-form-button");
-  const formEl = document.getElementById("add-form");
+  const nameEl = document.getElementById('add-form-name');
+  const textEl = document.getElementById('add-form-text');
+  const buttonEl = document.getElementById('add-form-button');
+  const formEl = document.getElementById('add-form');
 
-  textEl.addEventListener("input", ev);
+  textEl.addEventListener('input', ev);
   function ev(event) {
     textValue = event.target.value;
   }
@@ -110,7 +112,7 @@ export function formAction() {
 
   userInput1({ nameEl, textEl, formEl, buttonEl });
 
-  buttonEl.addEventListener("click", () => {
+  buttonEl.addEventListener('click', () => {
     userInput2({ nameEl, textEl });
 
     const fetchPostAndRenderComments = () => {
@@ -120,34 +122,34 @@ export function formAction() {
         })
         .then(() => {
           buttonEl.disabled = true;
-          textValue = "";
+          textValue = '';
           setLoading(true);
           formLoader();
         })
         .catch((error) => {
           // debugger
-          if (error.message === "Неправильный запрос") {
-            alert("Длина имени и комментария должна быть более 3 символов");
+          if (error.message === 'Неправильный запрос') {
+            alert('Длина имени и комментария должна быть более 3 символов');
             console.warn(error);
             textValue = textEl.value;
             setLoading(true);
             formLoader();
             return;
           }
-          if (error.message === "Сервер сломался") {
+          if (error.message === 'Сервер сломался') {
             console.warn(error);
-            console.log("Повторная отправка");
+            console.log('Повторная отправка');
             fetchPostAndRenderComments();
             return;
           }
-          if (error.message === "Failed to fetch") {
+          if (error.message === 'Failed to fetch') {
             console.warn(error);
             alert(
-              "Сбой подключения! Пожалуйста, проверьте подключение и повторите отправку."
+              'Сбой подключения! Пожалуйста, проверьте подключение и повторите отправку.',
             );
-            const appElement = document.getElementById("app")
+            const appElement = document.getElementById('app');
             appElement.textContent =
-              "Комментарии не загружены. Пожалуйста, проверьте подключение и повторите отправку.";
+              'Комментарии не загружены. Пожалуйста, проверьте подключение и повторите отправку.';
             return;
           }
         });

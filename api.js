@@ -1,7 +1,7 @@
-import { formLoader } from "./renderLoader.js";
+import { formLoader } from './renderLoader.js';
 
-const commentsURL = "https://wedev-api.sky.pro/api/v2/:evich/comments";
-export const userURL = "https://wedev-api.sky.pro/api/user/login";
+const commentsURL = 'https://wedev-api.sky.pro/api/v2/:evich/comments';
+export const userURL = 'https://wedev-api.sky.pro/api/user/login';
 
 export let token = localStorage.getItem('token');
 export const setToken = (newToken) => {
@@ -14,13 +14,13 @@ export const setLoading = (newLoading) => {
 };
 
 export function fetchGet() {
-  console.log("fetchGet");
+  console.log('fetchGet');
   return fetch(commentsURL, {
-    method: "GET",
+    method: 'GET',
   })
     .then((response) => {
       if (response.status === 500) {
-        throw new Error("Сервер сломался");
+        throw new Error('Сервер сломался');
       }
       return response;
     })
@@ -33,7 +33,7 @@ export function fetchPost({ name, text }) {
   isLoading = false;
   formLoader();
   return fetch(commentsURL, {
-    method: "POST",
+    method: 'POST',
     headers: { Authorization: `Bearer ${token}` },
     body: JSON.stringify({
       name: name,
@@ -43,10 +43,10 @@ export function fetchPost({ name, text }) {
   })
     .then((response) => {
       if (response.status === 400) {
-        throw new Error("Неправильный запрос");
+        throw new Error('Неправильный запрос');
       }
       if (response.status === 500) {
-        throw new Error("Сервер сломался");
+        throw new Error('Сервер сломался');
       }
       return response;
     })
@@ -57,7 +57,7 @@ export function fetchPost({ name, text }) {
 
 export function login({ login, password }) {
   return fetch(userURL, {
-    method: "POST",
+    method: 'POST',
     body: JSON.stringify({
       login,
       password,
@@ -65,7 +65,7 @@ export function login({ login, password }) {
   })
     .then((response) => {
       if (response.status === 400) {
-        throw new Error("Нет авторизации");
+        throw new Error('Нет авторизации');
       }
       return response;
     })
@@ -73,8 +73,8 @@ export function login({ login, password }) {
       return response.json();
     })
     .catch((error) => {
-      if (error.message === "Нет авторизации") {
-        alert("Неверный логин или пароль");
+      if (error.message === 'Нет авторизации') {
+        alert('Неверный логин или пароль');
         console.warn(error);
       }
     });

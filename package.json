@@ -4,7 +4,8 @@
   "description": "Лента комментариев",
   "main": "main.js",
   "scripts": {
-    "dev": "webpack --mode development --watch"
+    "dev": "webpack --mode development --watch",
+    "format": "prettier --write ./"
   },
   "author": "",
   "license": "ISC",
@@ -12,6 +13,7 @@
     "date-fns": "^3.6.0"
   },
   "devDependencies": {
+    "prettier": "^3.2.5",
     "webpack-cli": "^5.1.4"
   }
 }

@@ -1,12 +1,12 @@
-import { fetchGet, setLoading } from "./api.js";
-import { renderComments } from "./renderComments.js";
-import { formatDate } from "./formatdate.js";
-import { format } from "date-fns";
+import { fetchGet, setLoading } from './api.js';
+import { renderComments } from './renderComments.js';
+import { formatDate } from './formatdate.js';
+import { format } from 'date-fns';
 
 let comments = [];
 
 export const fetchGetAndRenderComments = () => {
-  console.log("fetchGetAndRenderComments");
+  console.log('fetchGetAndRenderComments');
   fetchGet()
     .then((responseData) => {
       const appComments = responseData.comments.map((comment) => {
@@ -25,19 +25,19 @@ export const fetchGetAndRenderComments = () => {
       renderComments(comments);
     })
     .catch((error) => {
-      if (error.message === "Failed to fetch") {
+      if (error.message === 'Failed to fetch') {
         console.warn(error);
         alert(
-          "Сбой подключения! Пожалуйста, проверьте подключение и обновите страницу."
+          'Сбой подключения! Пожалуйста, проверьте подключение и обновите страницу.',
         );
-        const appElement = document.getElementById("app");
+        const appElement = document.getElementById('app');
         appElement.textContent =
-          "Комментарии не загружены. Пожалуйста, проверьте подключение и обновите страницу.";
+          'Комментарии не загружены. Пожалуйста, проверьте подключение и обновите страницу.';
         return;
       }
-      if (error.message === "Сервер сломался") {
+      if (error.message === 'Сервер сломался') {
         console.warn(error);
-        console.log("Повторная загрузка");
+        console.log('Повторная загрузка');
         fetchGet();
         return;
       }
