@@ -1,13 +1,13 @@
 import { token } from "./api.js";
-import {renderComments} from "./renderComments.js"
+import { renderComments } from "./renderComments.js"
 
 function delay(interval = 300) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve();
-      }, interval);
-    });
-  }
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, interval);
+  });
+}
 
 export const initLikeButtonListener = (comments) => {
   if (!token) return;

@@ -2,12 +2,17 @@
   from {
     transform: rotate(0deg);
   }
+
   25% {
-    transform: rotate(30deg);;
+    transform: rotate(30deg);
+    ;
   }
+
   75% {
-    transform: rotate(-30deg);;
+    transform: rotate(-30deg);
+    ;
   }
+
   to {
     transform: rotate(0deg);
   }
@@ -213,7 +218,8 @@ body {
   padding-bottom: 20px;
 }
 
-.login-link, .reg-link {
+.login-link,
+.reg-link {
   text-decoration: underline;
   cursor: pointer;
 }

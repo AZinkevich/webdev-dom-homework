@@ -1,6 +1,7 @@
 import { fetchGet, setLoading } from "./api.js";
 import { renderComments } from "./renderComments.js";
 import { formatDate } from "./formatdate.js";
+import { format } from "date-fns";
 
 let comments = [];
 
@@ -14,7 +15,7 @@ export const fetchGetAndRenderComments = () => {
           text: comment.text,
           like_active: comment.isLiked,
           like_count: comment.likes,
-          date: formatDate(new Date(comment.date)),
+          date: format(new Date(comment.date), 'yyyy-MM-dd hh.mm.ss'),
           forceError: true,
         };
       });

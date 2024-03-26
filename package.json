@@ -1,0 +1,17 @@
+{
+  "name": "webdev-dom-homework",
+  "version": "1.0.0",
+  "description": "Лента комментариев",
+  "main": "main.js",
+  "scripts": {
+    "dev": "webpack --mode development --watch"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "date-fns": "^3.6.0"
+  },
+  "devDependencies": {
+    "webpack-cli": "^5.1.4"
+  }
+}
