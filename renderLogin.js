@@ -1,8 +1,8 @@
-import { login, setLoading, setToken } from "./api.js";
-import { renderReg } from "./renderReg.js";
+import { login, setLoading, setToken } from './api.js';
+import { renderReg } from './renderReg.js';
 
 export const renderLogin = ({ fetchGetAndRenderComments }) => {
-  const appElement = document.getElementById("app");
+  const appElement = document.getElementById('app');
   const loginHTML = `
     <div id="login-form" class="add-form">
     <h3 class="form-title">Форма входа</h3>
@@ -26,17 +26,17 @@ export const renderLogin = ({ fetchGetAndRenderComments }) => {
     `;
   appElement.innerHTML = loginHTML;
 
-  const regLinkEl = document.getElementById("reg-link");
-  regLinkEl.addEventListener("click", () => {
+  const regLinkEl = document.getElementById('reg-link');
+  regLinkEl.addEventListener('click', () => {
     renderReg({ fetchGetAndRenderComments });
   });
 
-  const ButtonElement = document.getElementById("login-button");
-  const loginInputElement = document.getElementById("login-input");
-  const passwordInputElement = document.getElementById("password-input");
+  const ButtonElement = document.getElementById('login-button');
+  const loginInputElement = document.getElementById('login-input');
+  const passwordInputElement = document.getElementById('password-input');
 
-  ButtonElement.addEventListener("click", () => {
-    login({      
+  ButtonElement.addEventListener('click', () => {
+    login({
       login: loginInputElement.value,
       password: passwordInputElement.value,
     })
@@ -46,8 +46,11 @@ export const renderLogin = ({ fetchGetAndRenderComments }) => {
         return responseData;
       })
       .then((responseData) => {
-        if (responseData.status === "Cannot read properties of undefined (reading 'user')") {
-          throw new Error("Нет авторизации");
+        if (
+          responseData.status ===
+          "Cannot read properties of undefined (reading 'user')"
+        ) {
+          throw new Error('Нет авторизации');
         }
         return responseData;
       })
@@ -57,7 +60,7 @@ export const renderLogin = ({ fetchGetAndRenderComments }) => {
         fetchGetAndRenderComments();
       })
       .catch((error) => {
-        if (error.message === "Нет авторизации") {
+        if (error.message === 'Нет авторизации') {
           console.warn(error);
         }
       });

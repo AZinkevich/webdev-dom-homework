@@ -1,12 +1,11 @@
-import { isLoading } from "./api.js";
-import { fetchGetAndRenderComments } from "./main.js";
+import { isLoading } from './api.js';
+import { fetchGetAndRenderComments } from './main.js';
 
 export const formLoader = () => {
-  const appFormLoader = document.getElementById("add-form");
+  const appFormLoader = document.getElementById('add-form');
   if (isLoading) {
     fetchGetAndRenderComments();
-  }
-  else {
+  } else {
     appFormLoader.innerHTML = `<div class="loader" id="form-loader">
     Комментарий добавляется...
   </div>`;
