@@ -7,6 +7,7 @@
     "dev": "webpack --mode development --watch",
     "format": "prettier --write ./",
     "lint:js": "eslint ./**/*.js",
+    "lint": "lint:js",
     "prepare": "husky install"
   },
   "author": "",
@@ -18,7 +19,7 @@
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",
-    "husky": "^9.0.11",
+    "husky": "^8.0.3",
     "prettier": "^3.2.5",
     "webpack-cli": "^5.1.4"
   }
